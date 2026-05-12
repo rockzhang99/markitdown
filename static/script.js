@@ -5,12 +5,92 @@
 (function () {
     'use strict';
 
+    // === Internationalization (i18n) ===
+    const i18n = {
+        en: {
+            subtitle: 'Document to Markdown Converter',
+            dropText: 'Drop your file here',
+            dropOr: 'or',
+            dropBrowse: 'browse files',
+            removeFile: 'Remove file',
+            convert: 'Convert to Markdown',
+            converting: 'Converting your document...',
+            tabPreview: 'Preview',
+            tabRaw: 'Raw Markdown',
+            copy: 'Copy',
+            copied: 'Copied!',
+            save: 'Save .md',
+            convertAnother: 'Convert Another',
+            supported: 'Supported: PDF, DOCX, PPTX, XLSX, HTML, CSV, JSON, XML, ZIP, EPUB',
+            poweredBy: 'Powered by',
+            dismiss: 'Dismiss',
+            desktopApp: 'Desktop App',
+            langLabel: '中文',
+            errorUnsupported: 'Unsupported format: {ext}. Supported formats: {formats}',
+            errorTooLarge: 'File too large ({size}). Maximum size is 50MB.',
+            errorConversionFailed: 'Conversion failed',
+            errorUnexpected: 'An unexpected error occurred.',
+            errorCopyFailed: 'Failed to copy to clipboard.',
+            noContent: 'No content.',
+        },
+        zh: {
+            subtitle: '文档转 Markdown 转换器',
+            dropText: '将文件拖放到此处',
+            dropOr: '或',
+            dropBrowse: '浏览文件',
+            removeFile: '移除文件',
+            convert: '转换为 Markdown',
+            converting: '正在转换文档...',
+            tabPreview: '预览',
+            tabRaw: '原始 Markdown',
+            copy: '复制',
+            copied: '已复制!',
+            save: '保存 .md',
+            convertAnother: '继续转换',
+            supported: '支持格式：PDF, DOCX, PPTX, XLSX, HTML, CSV, JSON, XML, ZIP, EPUB',
+            poweredBy: '由',
+            dismiss: '关闭',
+            desktopApp: '桌面应用',
+            langLabel: 'English',
+            errorUnsupported: '不支持的格式：{ext}。支持的格式：{formats}',
+            errorTooLarge: '文件过大（{size}）。最大支持 50MB。',
+            errorConversionFailed: '转换失败',
+            errorUnexpected: '发生未知错误。',
+            errorCopyFailed: '复制到剪贴板失败。',
+            noContent: '无内容。',
+        }
+    };
+
+    let currentLang = localStorage.getItem('markitdown-lang') || 'en';
+
+    function t(key, params) {
+        let text = i18n[currentLang][key] || i18n['en'][key] || key;
+        if (params) {
+            Object.keys(params).forEach(k => {
+                text = text.replace(`{${k}}`, params[k]);
+            });
+        }
+        return text;
+    }
+
+    function applyI18n() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            el.textContent = t(el.dataset.i18n);
+        });
+        document.querySelectorAll('[data-i18n-title]').forEach(el => {
+            el.title = t(el.dataset.i18nTitle);
+        });
+        const langBtn = document.getElementById('langToggle');
+        if (langBtn) {
+            langBtn.querySelector('span').textContent = t('langLabel');
+        }
+        document.documentElement.lang = currentLang;
+    }
+
     // === Constants ===
     const ALLOWED_EXTENSIONS = new Set([
         '.pdf', '.docx', '.pptx', '.xlsx', '.xls',
         '.html', '.htm', '.csv', '.json', '.xml',
-        '.jpg', '.jpeg', '.png',
-        '.wav', '.mp3', '.m4a',
         '.zip', '.epub', '.ipynb', '.msg',
     ]);
     const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
@@ -47,6 +127,16 @@
     document.addEventListener('DOMContentLoaded', init);
 
     function init() {
+        // Apply initial language
+        applyI18n();
+
+        // Language toggle
+        document.getElementById('langToggle').addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'zh' : 'en';
+            localStorage.setItem('markitdown-lang', currentLang);
+            applyI18n();
+        });
+
         // Drop zone events
         dropZone.addEventListener('click', () => fileInput.click());
         dropZone.addEventListener('dragenter', onDragEnter);
@@ -128,13 +218,13 @@
         if (!ALLOWED_EXTENSIONS.has(ext)) {
             return {
                 valid: false,
-                error: `Unsupported format: ${ext}. Supported formats: ${Array.from(ALLOWED_EXTENSIONS).join(', ')}`,
+                error: t('errorUnsupported', { ext, formats: Array.from(ALLOWED_EXTENSIONS).join(', ') }),
             };
         }
         if (file.size > MAX_FILE_SIZE) {
             return {
                 valid: false,
-                error: `File too large (${formatSize(file.size)}). Maximum size is 50MB.`,
+                error: t('errorTooLarge', { size: formatSize(file.size) }),
             };
         }
         return { valid: true };
@@ -172,7 +262,7 @@
             });
 
             if (!response.ok) {
-                let message = 'Conversion failed';
+                let message = t('errorConversionFailed');
                 try {
                     const err = await response.json();
                     message = err.detail || message;
@@ -185,7 +275,7 @@
             originalFilename = data.filename || originalFilename;
             showOutput();
         } catch (err) {
-            showError(err.message || 'An unexpected error occurred.');
+            showError(err.message || t('errorUnexpected'));
             convertBtn.disabled = false;
         } finally {
             hideLoader();
@@ -227,14 +317,14 @@
         try {
             await navigator.clipboard.writeText(markdownResult);
             const originalHTML = copyBtn.innerHTML;
-            copyBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+            copyBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span>${t('copied')}</span>`;
             copyBtn.classList.add('btn--success');
             setTimeout(() => {
                 copyBtn.innerHTML = originalHTML;
                 copyBtn.classList.remove('btn--success');
             }, 2000);
         } catch (err) {
-            showError('Failed to copy to clipboard.');
+            showError(t('errorCopyFailed'));
         }
     }
 
@@ -302,7 +392,7 @@
 
     // === Minimal Markdown Renderer ===
     function renderMarkdown(text) {
-        if (!text) return '<p style="color: var(--color-text-muted);">No content.</p>';
+        if (!text) return `<p style="color: var(--color-text-muted);">${t('noContent')}</p>`;
 
         // Protect code blocks
         const codeBlocks = [];

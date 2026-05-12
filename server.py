@@ -26,8 +26,6 @@ DOWNLOAD_FILE = Path(__file__).parent / "MarkItDown-1.0.0-win-x64.zip"
 SUPPORTED_EXTENSIONS = {
     ".pdf", ".docx", ".pptx", ".xlsx", ".xls",
     ".html", ".htm", ".csv", ".json", ".xml",
-    ".jpg", ".jpeg", ".png",
-    ".wav", ".mp3", ".m4a",
     ".zip", ".epub", ".ipynb", ".msg",
 }
 
@@ -56,7 +54,6 @@ async def formats():
             "documents": [".pdf", ".docx", ".pptx", ".xlsx", ".xls", ".epub"],
             "web": [".html", ".htm"],
             "data": [".csv", ".json", ".xml", ".ipynb"],
-            "media": [".jpg", ".jpeg", ".png", ".wav", ".mp3", ".m4a"],
             "archive": [".zip"],
             "email": [".msg"],
         },
@@ -83,6 +80,7 @@ async def convert(file: UploadFile = File(...)):
 
     try:
         tmp_path.write_bytes(contents)
+
         result = await asyncio.to_thread(converter.convert, str(tmp_path))
 
         return {
@@ -91,6 +89,8 @@ async def convert(file: UploadFile = File(...)):
             "markdown": result.text_content,
             "title": getattr(result, "title", "") or "",
         }
+    except HTTPException:
+        raise
     except Exception as e:
         error_type = type(e).__name__
         raise HTTPException(status_code=500, detail=f"Conversion failed ({error_type}): {e}")

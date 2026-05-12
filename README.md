@@ -15,6 +15,26 @@ markitdown-desktop/
     └── script.js        # 前端逻辑（拖拽上传、转换、预览、复制、保存）
 ```
 
+## 本地启动
+
+```bash
+# 1. 创建虚拟环境
+python -m venv venv
+
+# 2. 激活虚拟环境
+.\venv\Scripts\activate        # Windows PowerShell
+# venv\Scripts\activate.bat     # Windows CMD
+# source venv/bin/activate      # Linux/macOS
+
+# 3. 安装依赖
+pip install -r requirements.txt
+
+# 4. 启动服务
+python main.py
+```
+
+启动后自动打开浏览器访问 http://127.0.0.1:8877
+
 ## 服务器部署流程
 
 以下以 Ubuntu 服务器为例，部署到 8877 端口。
