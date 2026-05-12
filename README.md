@@ -1,6 +1,6 @@
 # MarkItDown Web
 
-Document to Markdown Converter - Web 版。基于 Microsoft MarkItDown，支持 PDF、DOCX、PPTX、XLSX、HTML、CSV、JSON、XML、图片、音频等格式转换为 Markdown。
+Document to Markdown Converter - Web 版。基于 Microsoft MarkItDown，支持 PDF、DOCX、PPTX、XLSX、HTML、CSV、JSON、XML、ZIP、EPUB、IPYNB、MSG等格式转换为 Markdown。
 
 ## 项目结构
 
@@ -169,3 +169,9 @@ ssh -i your-key.pem ubuntu@YOUR_SERVER_IP "sudo systemctl restart markitdown"
 | GET | `/api/formats` | 返回支持的文件格式列表 |
 | POST | `/api/convert` | 上传文件并转换为 Markdown |
 | GET | `/download` | 下载单机版 zip 包 |
+
+## 联系作者
+
+欢迎扫码加微信交流：
+
+![WeChat QR Code](/static/wechat.png)
