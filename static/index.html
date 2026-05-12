@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarkItDown</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header__inner">
+                <svg class="header__icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10 9 9 9 8 9"/>
+                </svg>
+                <h1 class="header__title">MarkItDown</h1>
+                <span class="header__subtitle">Document to Markdown Converter</span>
+                <a href="/download" class="btn btn--download" title="Download Desktop App">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Desktop App
+                </a>
+            </div>
+        </header>
+
+        <main class="main">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div id="dropZone" class="drop-zone">
+                    <svg class="drop-zone__icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <p class="drop-zone__text">Drop your file here</p>
+                    <p class="drop-zone__hint">or <button type="button" class="drop-zone__browse">browse files</button></p>
+                    <input type="file" id="fileInput" hidden
+                        accept=".pdf,.docx,.pptx,.xlsx,.xls,.html,.htm,.csv,.json,.xml,.jpg,.jpeg,.png,.wav,.mp3,.m4a,.zip,.epub,.ipynb,.msg">
+                </div>
+
+                <div id="fileInfo" class="file-info" hidden>
+                    <svg class="file-info__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                        <polyline points="13 2 13 9 20 9"/>
+                    </svg>
+                    <span class="file-info__name"></span>
+                    <span class="file-info__size"></span>
+                    <button type="button" class="file-info__remove" title="Remove file">&times;</button>
+                </div>
+
+                <button id="convertBtn" class="btn btn--primary" disabled>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="16 16 12 12 8 16"/>
+                        <line x1="12" y1="12" x2="12" y2="21"/>
+                        <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+                    </svg>
+                    Convert to Markdown
+                </button>
+            </section>
+
+            <!-- Loading -->
+            <div id="loader" class="loader" hidden>
+                <div class="loader__spinner"></div>
+                <p class="loader__text">Converting your document...</p>
+            </div>
+
+            <!-- Error -->
+            <div id="error" class="error-message" hidden>
+                <svg class="error-message__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span class="error-message__text"></span>
+                <button type="button" class="error-message__dismiss" title="Dismiss">&times;</button>
+            </div>
+
+            <!-- Output Section -->
+            <section id="output" class="output-section" hidden>
+                <div class="output-header">
+                    <div class="output-tabs">
+                        <button class="tab tab--active" data-tab="preview">Preview</button>
+                        <button class="tab" data-tab="raw">Raw Markdown</button>
+                    </div>
+                    <div class="output-actions">
+                        <button id="copyBtn" class="btn btn--secondary btn--sm">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            Copy
+                        </button>
+                        <button id="saveBtn" class="btn btn--secondary btn--sm">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Save .md
+                        </button>
+                        <button id="clearBtn" class="btn btn--ghost btn--sm">Convert Another</button>
+                    </div>
+                </div>
+                <div class="output-content">
+                    <div id="previewPane" class="output-pane markdown-body"></div>
+                    <div id="rawPane" class="output-pane" hidden>
+                        <pre><code id="rawContent"></code></pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Supported: PDF, DOCX, PPTX, XLSX, HTML, CSV, JSON, XML, Images, Audio, ZIP, EPUB</p>
+            <p class="footer__credit">Powered by <a href="https://github.com/microsoft/markitdown" target="_blank" rel="noopener">Microsoft MarkItDown</a></p>
+        </footer>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
