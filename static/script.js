@@ -9,6 +9,9 @@
     const i18n = {
         en: {
             subtitle: 'Document to Markdown Converter',
+            contactAuthor: 'Contact Author',
+            scanWechat: 'Scan WeChat QR Code',
+            wechatHint: 'Scan the QR code to add author on WeChat',
             dropText: 'Drop your file here',
             dropOr: 'or',
             dropBrowse: 'browse files',
@@ -35,6 +38,9 @@
         },
         zh: {
             subtitle: '文档转 Markdown 转换器',
+            contactAuthor: '联系作者',
+            scanWechat: '扫码加微信',
+            wechatHint: '扫描二维码添加作者微信',
             dropText: '将文件拖放到此处',
             dropOr: '或',
             dropBrowse: '浏览文件',
@@ -122,6 +128,8 @@
     const saveBtn = $('#saveBtn');
     const clearBtn = $('#clearBtn');
     const tabs = document.querySelectorAll('.tab');
+    const contactBtn = $('#contactBtn');
+    const wechatModal = $('#wechatModal');
 
     // === Initialization ===
     document.addEventListener('DOMContentLoaded', init);
@@ -135,6 +143,37 @@
             currentLang = currentLang === 'en' ? 'zh' : 'en';
             localStorage.setItem('markitdown-lang', currentLang);
             applyI18n();
+        });
+
+        // Contact button - show WeChat QR code
+        if (contactBtn) {
+            contactBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const modal = document.getElementById('wechatModal');
+                if (modal) {
+                    modal.hidden = false;
+                } else {
+                    console.error('WeChat modal not found');
+                }
+            });
+        }
+
+        // Modal close button
+        const modalClose = $('.modal__close');
+        if (modalClose) {
+            modalClose.addEventListener('click', () => {
+                const modal = document.getElementById('wechatModal');
+                if (modal) {
+                    modal.hidden = true;
+                }
+            });
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && wechatModal && !wechatModal.hidden) {
+                wechatModal.hidden = true;
+            }
         });
 
         // Drop zone events
